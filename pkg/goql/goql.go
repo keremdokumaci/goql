@@ -1,6 +1,7 @@
 package goql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -16,12 +17,15 @@ var (
 	ErrDBConfigurationIsMandatory error = errors.New("db configuration is mandatory")
 )
 
+/*
+	TODO:
+		- WhiteLister struct
+			- there should be a migration mechanism to add & remove whitelisting dynamically.
+		- Cacher struct
+			- there should be a migration mechanism to add & remove whitelisting dynamically.
+*/
+
 type goQL struct {
-	CacheAll bool
-
-	whiteList []string
-	cacheList []string
-
 	cache       cache.Cacher
 	repository  repository.Repository
 	whitelister whitelist.WhiteLister
@@ -41,12 +45,20 @@ func (goql *goQL) UseWhitelist(operationNames ...string) error {
 	return nil
 }
 
+// ConfigureDB initializes repository via given dbName and db instance. Then migrates the database.
 func (goql *goQL) ConfigureDB(dbName DB, db *sql.DB) error {
+	// init repository
 	switch dbName {
 	case POSTGRES:
 		goql.repository = postgres.New(db)
 	default:
 		return ErrUnexpectedDBType
+	}
+
+	// migrate database
+	err := goql.repository.Migrate(context.TODO())
+	if err != nil {
+		return err
 	}
 
 	return nil

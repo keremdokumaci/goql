@@ -13,6 +13,11 @@ func (p *postgresRepository) WhitelistExistsOperation(ctx context.Context, name 
 	return p.db.QueryRowContext(ctx, "select * from goql.whitelists where name=$1", name) != nil
 }
 
+func (p *postgresRepository) Migrate(ctx context.Context) error {
+	// TODO: migrate
+	return nil
+}
+
 func New(db *sql.DB) *postgresRepository {
 	return &postgresRepository{
 		db: db,
