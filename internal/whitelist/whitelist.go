@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/keremdokumaci/goql/internal/cache"
-	"github.com/keremdokumaci/goql/internal/whitelist/repository"
+	"github.com/keremdokumaci/goql/internal/repository"
 )
 
 type WhiteLister interface {
