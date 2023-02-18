@@ -1,9 +1,15 @@
 package cacher
 
-import "github.com/keremdokumaci/goql/internal/cache"
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"time"
+
+	"github.com/keremdokumaci/goql/internal/cache"
+)
 
 type GQLCacher interface {
-	GetOperation(operationName string) (string, error)
+	GetOperation(operationName string) any
 }
 
 type gqlCacher struct {
@@ -16,6 +22,18 @@ func New(cache cache.Cacher) GQLCacher {
 	}
 }
 
-func (g *gqlCacher) GetOperation(operationName string) (string, error) {
-	return "", nil
+func (g *gqlCacher) CacheQuery(query string, response any, ttl ...time.Duration) error {
+	var tl time.Duration
+	if len(ttl) > 0 {
+		tl = ttl[0]
+	}
+
+	hashAlgorithm := sha256.New()
+	hashAlgorithm.Write([]byte(query))
+
+	return g.cache.Set(hex.EncodeToString(hashAlgorithm.Sum(nil)), response, tl)
+}
+
+func (g *gqlCacher) GetOperation(operationName string) any {
+	return g.cache.Get(operationName)
 }

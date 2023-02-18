@@ -15,7 +15,12 @@ type InmemoryCacher struct {
 }
 
 func (c *InmemoryCacher) Get(key string) any {
-	return c.cache.Get(key).Value()
+	item := c.cache.Get(key)
+	if item == nil {
+		return nil
+	}
+
+	return item.Value()
 }
 
 func (c *InmemoryCacher) Set(key string, value any, ttl ...time.Duration) error {
