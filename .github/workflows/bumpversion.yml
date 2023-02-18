@@ -1,0 +1,35 @@
+name: Bumpversion Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: choice
+        description: "Version to bump?"
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: bumpversion-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bump_the_version:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+    steps:
+      - name: "Checkout repository"
+        uses: 'actions/checkout@v3'
+
+      - name: "Install bump2version"
+        run: pip install --upgrade bump2version
+
+      - name: "Bump the version"
+        run: |
+          git config --global user.name "Github Actions"
+          bump2version ${{ github.event.inputs.version }}
+          git push --follow-tags
