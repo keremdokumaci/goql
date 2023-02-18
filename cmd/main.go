@@ -1,16 +1,12 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/keremdokumaci/goql/pkg/gql"
+	"github.com/keremdokumaci/goql/pkg/goql"
 )
 
 func main() {
-	doc, err := gql.Parse("query")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(doc.OperationName())
+	gq := goql.New()
+	gq.ConfigureCache(goql.INMEMORY)
+	cacher, _ := gq.UseGQLCacher()
+	cacher.GetOperation("getProducts")
 }

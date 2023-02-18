@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
+
+	"github.com/keremdokumaci/goql/internal/models"
 )
 
-type Repository interface {
-	Migrate(ctx context.Context) error
-	WhitelistExistsOperation(ctx context.Context, name string) bool
+type Repository[T models.Modeler] interface {
+	Get(ctx context.Context, ID int) (T, error)
 }

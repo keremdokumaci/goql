@@ -1,66 +1,74 @@
 package goql
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
 	"github.com/keremdokumaci/goql/internal/cache"
 	"github.com/keremdokumaci/goql/internal/cache/inmemory"
+	"github.com/keremdokumaci/goql/internal/cache/redis"
+	"github.com/keremdokumaci/goql/internal/cacher"
+	"github.com/keremdokumaci/goql/internal/models"
 	"github.com/keremdokumaci/goql/internal/repository"
 	"github.com/keremdokumaci/goql/internal/repository/postgres"
 	"github.com/keremdokumaci/goql/internal/whitelist"
 )
 
 var (
-	ErrUnexpectedDBType           error = errors.New("unexpected db type")
-	ErrDBConfigurationIsMandatory error = errors.New("db configuration is mandatory")
+	ErrUnexpectedDBType              error = errors.New("unexpected db type")
+	ErrDBConfigurationIsMandatory    error = errors.New("db configuration is mandatory")
+	ErrCacheConfigurationIsMandatory error = errors.New("cache configuration is mandatory")
 )
 
-/*
-	TODO:
-		- WhiteLister struct
-			- there should be a migration mechanism to add & remove whitelisting dynamically.
-		- Cacher struct
-			- there should be a migration mechanism to add & remove whitelisting dynamically.
-*/
-
 type goQL struct {
-	cache       cache.Cacher
-	repository  repository.Repository
-	whitelister whitelist.WhiteLister
+	cache  cache.Cacher
+	db     *sql.DB
+	dbName DB
 }
 
 // New returns a goQL struct pointer.
 func New() *goQL {
-	var goql *goQL
-	goql.cache = inmemory.New()
+	return &goQL{}
+}
+
+func (goql *goQL) ConfigureDB(dbName DB, db *sql.DB) *goQL {
+	goql.db = db
+	goql.dbName = dbName
+
 	return goql
 }
 
-func (goql *goQL) UseWhitelist(operationNames ...string) error {
-	if goql.repository == nil {
-		return ErrDBConfigurationIsMandatory
+func (goql *goQL) ConfigureCache(cacheName Cache) *goQL {
+	switch cacheName {
+	case INMEMORY:
+		goql.cache = inmemory.New()
+	case REDIS:
+		goql.cache = redis.New()
 	}
-	goql.whitelister = whitelist.New(goql.repository, goql.cache)
-	return nil
+
+	return goql
 }
 
-// ConfigureDB initializes repository via given dbName and db instance.
-func (goql *goQL) ConfigureDB(dbName DB, db *sql.DB) error {
-	// init repository
-	switch dbName {
+func (goql *goQL) UseWhitelister() (whitelist.WhiteLister, error) {
+	if goql.dbName == "" || goql.db == nil {
+		return nil, ErrDBConfigurationIsMandatory
+	}
+
+	var repo repository.Repository[models.Whitelist]
+	switch goql.dbName {
 	case POSTGRES:
-		goql.repository = postgres.New(db)
+		repo = postgres.New[models.Whitelist](goql.db)
 	default:
-		return ErrUnexpectedDBType
+		return nil, ErrUnexpectedDBType
 	}
 
-	// migrate database
-	err := goql.repository.Migrate(context.TODO())
-	if err != nil {
-		return err
+	return whitelist.New(repo, goql.cache), nil
+}
+
+func (goql *goQL) UseGQLCacher() (cacher.GQLCacher, error) {
+	if goql.cache == nil {
+		return nil, ErrCacheConfigurationIsMandatory
 	}
 
-	return nil
+	return cacher.New(goql.cache), nil
 }
