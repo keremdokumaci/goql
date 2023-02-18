@@ -12,5 +12,7 @@
 For GraphQL **Query**
 
 💾 `Caching`
+
 ® `White Listing`
+
 ⛔ `Query Depth Checking`
