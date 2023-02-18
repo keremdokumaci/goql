@@ -41,7 +41,7 @@ func (goql *goQL) ConfigureDB(dbName DB, db *sql.DB) *goQL {
 func (goql *goQL) ConfigureCache(cacheName Cache) *goQL {
 	switch cacheName {
 	case INMEMORY:
-		goql.cache = inmemory.New()
+		goql.cache = inmemory.New(nil)
 	case REDIS:
 		goql.cache = redis.New()
 	}

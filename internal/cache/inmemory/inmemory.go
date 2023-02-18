@@ -33,8 +33,10 @@ func (c *InmemoryCacher) Set(key string, value any, ttl ...time.Duration) error 
 	return nil
 }
 
-func New() *InmemoryCacher {
-	cache := ttlcache.New[string, any]()
+func New(cache *ttlcache.Cache[string, any]) *InmemoryCacher {
+	if cache == nil {
+		cache = ttlcache.New[string, any]()
+	}
 
 	return &InmemoryCacher{
 		cache: cache,
