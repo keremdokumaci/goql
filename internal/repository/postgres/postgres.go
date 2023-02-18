@@ -5,11 +5,12 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/keremdokumaci/goql/internal/models"
 )
 
 type postgresRepository[T models.Modeler] struct {
-	db *sql.DB
+	sqlxDB *sqlx.DB
 }
 
 func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
@@ -17,8 +18,8 @@ func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
 	tableName := model.TableName()
 	query := fmt.Sprintf("select * from goql.%s where id=%d", tableName, ID)
 
-	row := r.db.QueryRowContext(ctx, query)
-	err := row.Scan(&model)
+	row := r.sqlxDB.QueryRowxContext(ctx, query)
+	err := row.StructScan(&model)
 	if err != nil {
 		return model, err
 	}
@@ -28,6 +29,6 @@ func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
 
 func New[T models.Modeler](db *sql.DB) *postgresRepository[T] {
 	return &postgresRepository[T]{
-		db: db,
+		sqlxDB: sqlx.NewDb(db, "pgx"),
 	}
 }
