@@ -24,12 +24,8 @@ func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string
 	}
 
 	_, err := w.repo.Get(ctx, 123) //TODO: Get by specification.
-	if err != nil {
-		//TODO: log error.
-		return false
-	}
 
-	return true
+	return err == nil
 }
 
 func New(repo repository.Repository[models.Whitelist], cacher cache.Cacher) WhiteLister {
