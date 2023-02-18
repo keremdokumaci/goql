@@ -1,4 +1,4 @@
-name: Bumpversion Staging
+name: Bumpversion
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ concurrency:
 jobs:
   bump_the_version:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging'
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: "Checkout repository"
         uses: 'actions/checkout@v3'
