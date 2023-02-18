@@ -1,13 +1,16 @@
 package models
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Modeler interface {
 	TableName() string
 }
 
 type BaseModel struct {
-	ID        int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int          `db:"id"`
+	CreatedAt time.Time    `db:"created_at"`
+	UpdatedAt sql.NullTime `db:"updated_at"`
 }

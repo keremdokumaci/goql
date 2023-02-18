@@ -23,7 +23,7 @@ func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string
 		return true
 	}
 
-	_, err := w.repo.Get(ctx, 123) //TODO: Get by specification.
+	_, err := w.repo.GetByUniqueField(ctx, "operation_name", operationName)
 
 	return err == nil
 }
