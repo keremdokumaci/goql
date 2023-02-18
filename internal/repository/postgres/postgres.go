@@ -10,15 +10,30 @@ import (
 )
 
 type postgresRepository[T models.Modeler] struct {
-	sqlxDB *sqlx.DB
+	sqlxDB    *sqlx.DB
+	tableName string
 }
 
 func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
-	var model T
-	tableName := model.TableName()
-	query := fmt.Sprintf("select * from goql.%s where id=%d", tableName, ID)
+	query := fmt.Sprintf("select * from goql.%s where id=%d", r.tableName, ID)
 
+	var model T
 	row := r.sqlxDB.QueryRowxContext(ctx, query)
+
+	err := row.StructScan(&model)
+	if err != nil {
+		return model, err
+	}
+
+	return model, nil
+}
+
+func (r *postgresRepository[T]) GetByUniqueField(ctx context.Context, field string, value any) (T, error) {
+	query := fmt.Sprintf("select * from goql.%s where %s=%v", r.tableName, field, value)
+
+	var model T
+	row := r.sqlxDB.QueryRowxContext(ctx, query)
+
 	err := row.StructScan(&model)
 	if err != nil {
 		return model, err
@@ -28,7 +43,10 @@ func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
 }
 
 func New[T models.Modeler](db *sql.DB) *postgresRepository[T] {
+	var model T
+	tableName := model.TableName()
 	return &postgresRepository[T]{
-		sqlxDB: sqlx.NewDb(db, "pgx"),
+		sqlxDB:    sqlx.NewDb(db, "pgx"),
+		tableName: tableName,
 	}
 }
