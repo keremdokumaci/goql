@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: "Checkout repository"
         uses: 'actions/checkout@v3'
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
 
       - name: "Install bump2version"
         run: pip install --upgrade bump2version
