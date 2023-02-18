@@ -3,93 +3,25 @@ package gql
 import (
 	"testing"
 
+	"github.com/keremdokumaci/goql/test/fixtures"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParse(t *testing.T) {
-	query := `
-		query GetProductVariantByVariantIds($first: Int!, $ids:[ID!]) {
-			productVariants(ids: $ids, first: $first) {
-				edges {
-				node {
-					id
-					name
-					sku
-					stocks {
-					warehouse {
-						id
-					}
-					}
-					product {
-						id
-						name
-					}
-				}
-				}
-		}
-		}
-	`
-
-	doc, err := Parse(query)
+	doc, err := Parse(fixtures.Query)
 
 	assert.Equal(t, doc.OperationName(), "GetProductVariantByVariantIds")
 	assert.Nil(t, err)
 }
 
 func TestParse_QueryHasNoName(t *testing.T) {
-	query := `
-		{
-			productVariants(ids: $ids, first: $first) {
-				edges {
-				node {
-					id
-					name
-					sku
-					stocks {
-					warehouse {
-						id
-					}
-					}
-					product {
-						id
-						name
-					}
-				}
-				}
-		}
-		}
-	`
-
-	doc, err := Parse(query)
+	doc, err := Parse(fixtures.QueryWithNoName)
 
 	assert.Equal(t, doc.OperationName(), "")
 	assert.Nil(t, err)
 }
 func TestParse_InvalidQuery(t *testing.T) {
-	query := `
-		{
-			(ids: $ids, first: $first) {
-				edges {
-				node {
-					id
-					name
-					sku
-					stocks {
-					warehouse {
-						id
-					}
-					}
-					product {
-						id
-						name
-					}
-				}
-				}
-		}
-		}
-	`
-
-	doc, err := Parse(query)
+	doc, err := Parse(fixtures.InvalidQuery)
 
 	assert.Nil(t, doc)
 	assert.NotNil(t, err)

@@ -10,6 +10,7 @@ import (
 
 type GQLCacher interface {
 	GetOperation(operationName string) any
+	CacheQuery(query string, response any, ttl ...time.Duration) error
 }
 
 type gqlCacher struct {
