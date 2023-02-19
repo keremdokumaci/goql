@@ -9,7 +9,7 @@ function run_command {
     
     if [ $status -ne 0 ]; then
         echo "\n$cmd failed"
-        if [ $exit_program -eq 0 ]; then
+        if [ $exit_program -eq 1 ]; then
             exit 1
         fi
     else
