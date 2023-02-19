@@ -8,18 +8,18 @@ function run_command {
     status=$?
     
     if [ $status -ne 0 ]; then
-        echo "\n$cmd failed"
+        echo "\\n$cmd failed"
         if [ $exit_program -eq 1 ]; then
             exit 1
         fi
     else
-        echo "\n$cmd command was successful"
+        echo "\\n$cmd command was successful"
     fi
     
     return $status
 }
 
-function colorized {
+function echo_colorized {
     GREEN='\033[0;32m'
     NC='\033[0m' # No Color
 
@@ -27,7 +27,7 @@ function colorized {
     color=$2
     
     if [ $color="green" ]; then
-        echo -e "\n${GREEN}${message}${NC}"
+        echo -e "\\n${GREEN}${message}${NC}"
     fi
 }
 
@@ -40,4 +40,4 @@ run_command "docker compose -f ../docker/docker-compose-test.yml up -d"
 echo "Running tests..."
 test_status=TEST_MODE=$1 run_command "go test -p 1 -v -race $(pwd)/../..."
 
-colorized "ALL TESTS PASSED" "green"
+echo_colorized "ALL TESTS PASSED" "green"
