@@ -17,6 +17,10 @@ task :command_exists, [:command] do |_, args|
   task :has_gsed do
     Rake::Task['command_exists'].invoke('gsed')
   end
+
+  task :has_migrate do
+    Rake::Task['command_exists'].invoke('migrate')
+  end
   
   AVAILABLE_REVISIONS = %w[major minor patch].freeze
   desc "bump version, default is: patch"
@@ -93,4 +97,23 @@ task :command_exists, [:command] do |_, args|
   desc "lint"
   task :lint => [:has_golangci_lint] do
     system "LOG_LEVEL=error golangci-lint run"
+  end
+  
+  desc "run migration (up,down) default: up"
+  task :migrate, [:direction] => [:has_migrate] do |_, args|
+    args.with_defaults(direction: 'up')
+    puts "-> will migrate to: \e[33m#{args.direction}\e[0m"
+    system %{
+      source .env && 
+      migrate -verbose -database "${DATABASE_URL}" -path migrations #{args.direction}
+    }
+  end
+  
+  desc "create new migration"
+  task :update, [:name] => [:has_migrate] do |_, args|
+    abort "please enter the name of migration" if args.name == nil
+
+    system "migrate create -ext sql -dir ./internal/repository/migrations/postgres -seq #{args.name}"
+    system "migrate create -ext sql -dir ./internal/repository/migrations/mysql -seq #{args.name}"
+    system "migrate create -ext sql -dir ./internal/repository/migrations/mssql -seq #{args.name}"
   end
