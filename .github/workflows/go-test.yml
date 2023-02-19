@@ -25,4 +25,6 @@ jobs:
         run: go mod download
      
       - name: Run tests
-        run: go test -p 1 -v -race ./...
+        run: |
+          chmod +x ./scripts/test.sh
+          ./scripts/test.sh
