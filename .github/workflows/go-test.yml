@@ -25,6 +25,4 @@ jobs:
         run: go mod download
      
       - name: Run tests
-        run: |
-          chmod +x ./test.sh
-          ./test.sh
+        run: make test
