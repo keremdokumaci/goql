@@ -1,4 +1,4 @@
 package goql
 
 // Version is the current version of statoo.
-const Version string = "0.0.1"
+const Version string = "0.1.0"
