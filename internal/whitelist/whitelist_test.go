@@ -52,7 +52,7 @@ func (s *WhitelistTestSuite) TestOperationAllowed_OperationNotInCache() {
 	// When
 	s.cache.On("Get", mock.AnythingOfType("string")).Return(nil)
 	s.repository.On("GetByUniqueField", mock.Anything, mock.AnythingOfType("string"), mock.Anything).
-		Return(models.Whitelist{
+		Return(&models.Whitelist{
 			OperationName: "test_operation",
 			BaseModel: models.BaseModel{
 				ID:        1,
