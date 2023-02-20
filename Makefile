@@ -1,3 +1,6 @@
+.PHONY: all test clean
+THIS_DIR:=$(dir $(abspath $(firstword $(MAKEFILE_LIST))))
+
 # Lint
 lint:
 	LOG_LEVEL=error golangci-lint run
@@ -14,3 +17,7 @@ create-migration:
 
 migrate:
 	migrate -verbose -database $(database_url) -path migrations $(dir)
+
+# Test
+test:
+	bash -c "$(THIS_DIR)scripts/test.sh"

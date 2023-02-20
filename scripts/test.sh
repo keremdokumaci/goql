@@ -32,12 +32,12 @@ function echo_colorized {
 }
 
 echo "Downgrading compose..."
-run_command "docker compose -f ../docker/docker-compose-test.yml down --rmi local --remove-orphans"
+run_command "docker compose -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
 
 echo "Running compose up..."
-run_command "docker compose -f ../docker/docker-compose-test.yml up -d"
+run_command "docker compose -f $(pwd)/docker/docker-compose-test.yml up -d"
 
 echo "Running tests..."
-test_status=TEST_MODE=$1 run_command "go test -p 1 -v -race $(pwd)/../..."
+test_status=TEST_MODE=$1 run_command "go test -p 1 -v -race $(pwd)/./..."
 
 echo_colorized "ALL TESTS PASSED" "green"

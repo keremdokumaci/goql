@@ -22,8 +22,8 @@ func (b *BaseSuite) TearDownSuite() {
 
 func (b *BaseSuite) PostgresConnection() error {
 	host := "127.0.0.1"
-	port := "5433"
-	user := "postgres"
+	port := "54325"
+	user := "postgres_test"
 	password := "mysecretpassword"
 	dbname := "postgres"
 
