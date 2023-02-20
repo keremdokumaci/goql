@@ -8,6 +8,7 @@ import (
 type TestMode string
 
 const (
+	ALL         TestMode = "all"
 	INTEGRATION TestMode = "integration"
 	UNIT        TestMode = "unit"
 )
@@ -19,8 +20,10 @@ func GetTestMode() TestMode {
 		return INTEGRATION
 	case string(UNIT):
 		return UNIT
+	case string(ALL):
+		return ALL
 	default:
-		fmt.Println("using default test mode... (unit)")
-		return UNIT
+		fmt.Println("using default test mode... (all)")
+		return ALL
 	}
 }
