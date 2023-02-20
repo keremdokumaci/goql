@@ -70,3 +70,27 @@ func (s *PostgresRepositorySuite) TestGet() {
 	s.Nil(err)
 	s.Equal(id, model.ID)
 }
+
+func (s *PostgresRepositorySuite) TestGetByUniqueField() {
+	// Given
+	ctx := context.TODO()
+	value := "get"
+	field := "operation_name"
+
+	// When
+	expectedQuery := fmt.Sprintf("select * from goql.test_models where %s=%s", field, value)
+	s.sqlMock.
+		ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+		WillReturnRows(
+			sqlmock.
+				NewRows([]string{"id", "created_at", "updated_at"}).
+				AddRow(1, time.Now(), nil),
+		)
+
+	// Then
+	model, err := s.sut.GetByUniqueField(ctx, field, value)
+
+	// Assertion
+	s.Nil(err)
+	s.NotNil(model)
+}

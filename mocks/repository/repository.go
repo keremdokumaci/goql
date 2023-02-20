@@ -36,14 +36,16 @@ func (_m *Repository[T]) Get(ctx context.Context, ID int) (T, error) {
 }
 
 // GetByUniqueField provides a mock function with given fields: ctx, field, value
-func (_m *Repository[T]) GetByUniqueField(ctx context.Context, field string, value interface{}) (T, error) {
+func (_m *Repository[T]) GetByUniqueField(ctx context.Context, field string, value interface{}) (*T, error) {
 	ret := _m.Called(ctx, field, value)
 
-	var r0 T
-	if rf, ok := ret.Get(0).(func(context.Context, string, interface{}) T); ok {
+	var r0 *T
+	if rf, ok := ret.Get(0).(func(context.Context, string, interface{}) *T); ok {
 		r0 = rf(ctx, field, value)
 	} else {
-		r0 = ret.Get(0).(T)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*T)
+		}
 	}
 
 	var r1 error

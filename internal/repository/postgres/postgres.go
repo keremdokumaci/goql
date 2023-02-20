@@ -28,7 +28,7 @@ func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
 	return model, nil
 }
 
-func (r *postgresRepository[T]) GetByUniqueField(ctx context.Context, field string, value any) (T, error) {
+func (r *postgresRepository[T]) GetByUniqueField(ctx context.Context, field string, value any) (*T, error) {
 	query := fmt.Sprintf("select * from goql.%s where %s=%v", r.tableName, field, value)
 
 	var model T
@@ -36,10 +36,10 @@ func (r *postgresRepository[T]) GetByUniqueField(ctx context.Context, field stri
 
 	err := row.StructScan(&model)
 	if err != nil {
-		return model, err
+		return nil, err
 	}
 
-	return model, nil
+	return &model, nil
 }
 
 func New[T models.Modeler](db *sql.DB) *postgresRepository[T] {
