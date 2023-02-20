@@ -1,17 +1,20 @@
-package gql
+package query
 
 import (
 	"github.com/graphql-go/graphql/language/ast"
 	"github.com/graphql-go/graphql/language/parser"
-	"github.com/pkg/errors"
 )
 
-type doc struct {
+type Query interface {
+	OperationName() string
+}
+
+type query struct {
 	*ast.Document
 }
 
-func (d *doc) OperationName() string {
-	definition := d.Definitions[0]
+func (q *query) OperationName() string {
+	definition := q.Definitions[0]
 
 	operationDef, ok := definition.(*ast.OperationDefinition)
 	if !ok || operationDef.Name == nil {
@@ -21,16 +24,14 @@ func (d *doc) OperationName() string {
 	return operationDef.Name.Value
 }
 
-func Parse(query string) (*doc, error) {
+func Parse(q string) (Query, error) {
 	document, err := parser.Parse(parser.ParseParams{
-		Source: query,
+		Source: q,
 	})
 
 	if err != nil {
-		return nil, errors.Wrap(err, "[gql].[parse]")
+		return nil, err
 	}
 
-	return &doc{
-		Document: document,
-	}, nil
+	return &query{Document: document}, nil
 }
