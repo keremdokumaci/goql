@@ -25,7 +25,6 @@ jobs:
         run: go mod download
      
       - name: Run tests
-        working-directory: ./scripts
         run: |
           chmod +x ./test.sh
           ./test.sh
