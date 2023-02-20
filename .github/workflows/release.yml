@@ -1,0 +1,28 @@
+name: Release new version
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
+      - name: Publish to pkg.go
+        env:
+          GOPROXY: proxy.golang.org 
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          git config --global user.name "keremdokumaci"
+          git config --global user.email "dokumaci.kerem@gmail.com"
+          GOPROXY=${{ env.GOPROXY }} go list -m github.com/keremdokumaci/goql@${{ env.RELEASE_VERSION }}
