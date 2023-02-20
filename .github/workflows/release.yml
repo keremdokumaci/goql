@@ -1,27 +1,23 @@
 name: Release new version
 on:
-  create:
-    tags:
-      - v*
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Define a tag"
+        required: true
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set output
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Check output
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ steps.vars.outputs.tag }}
+      - name: Checkout tag
+        uses: actions/checkout@v3
+        with:
+          ref: "refs/tags/${{ github.event.inputs.tag }}"
       - name: Publish to pkg.go
         env:
           GOPROXY: proxy.golang.org 
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+          RELEASE_VERSION: ${{ github.event.inputs.tag }}
         run: |
           git config --global user.name "keremdokumaci"
           git config --global user.email "dokumaci.kerem@gmail.com"
