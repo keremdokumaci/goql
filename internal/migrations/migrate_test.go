@@ -37,7 +37,8 @@ func (s *MigrateTestSuite) TestMigratePostgres() {
 	s.Nil(row.Err())
 
 	var version uint
-	row.Scan(&version)
+	err = row.Scan(&version)
+	s.Nil(err)
 
 	s.Equal(latestVersion, version)
 }
