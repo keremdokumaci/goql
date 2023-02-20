@@ -13,7 +13,7 @@ import (
 )
 
 type WhitelistTestSuite struct {
-	sut        WhiteLister
+	sut        *whiteLister
 	cache      *cacheMock.Cacher
 	repository *repositoryMock.Repository[models.Whitelist]
 	suite.Suite

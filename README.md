@@ -1,7 +1,7 @@
 ![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)
 [![GolangCI Lint](https://github.com/keremdokumaci/goql/actions/workflows/go-lint.yml/badge.svg)](https://github.com/keremdokumaci/goql/actions/workflows/go-lint.yml)
 [![Golang Tests](https://github.com/keremdokumaci/goql/actions/workflows/go-test.yml/badge.svg)](https://github.com/keremdokumaci/goql/actions/workflows/go-test.yml)
-![Test Coverage](https://img.shields.io/badge/coverage-76.0%25-orange.svg)
+![Test Coverage](https://img.shields.io/badge/coverage-84.0%25-orange.svg)
 
 # GoQL
 

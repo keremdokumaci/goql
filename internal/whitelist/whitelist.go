@@ -8,10 +8,6 @@ import (
 	"github.com/keremdokumaci/goql/internal/repository"
 )
 
-type WhiteLister interface {
-	OperationAllowed(ctx context.Context, operationName string) bool
-}
-
 type whiteLister struct {
 	repo   repository.Repository[models.Whitelist]
 	cacher cache.Cacher
@@ -28,7 +24,7 @@ func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string
 	return err == nil
 }
 
-func New(repo repository.Repository[models.Whitelist], cacher cache.Cacher) WhiteLister {
+func New(repo repository.Repository[models.Whitelist], cacher cache.Cacher) *whiteLister {
 	return &whiteLister{
 		repo:   repo,
 		cacher: cacher,

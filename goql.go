@@ -1,8 +1,10 @@
 package goql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/keremdokumaci/goql/internal/cache"
 	"github.com/keremdokumaci/goql/internal/cache/inmemory"
@@ -19,6 +21,15 @@ var (
 	ErrDBConfigurationIsMandatory    error = errors.New("db configuration is mandatory")
 	ErrCacheConfigurationIsMandatory error = errors.New("cache configuration is mandatory")
 )
+
+type WhiteLister interface {
+	OperationAllowed(ctx context.Context, operationName string) bool
+}
+
+type Cacher interface {
+	GetOperation(operationName string) any
+	CacheQuery(query string, response any, ttl ...time.Duration) error
+}
 
 type goQL struct {
 	cache  cache.Cacher
@@ -49,7 +60,7 @@ func (goql *goQL) ConfigureCache(cacheName Cache) *goQL {
 	return goql
 }
 
-func (goql *goQL) UseWhitelister() (whitelist.WhiteLister, error) {
+func (goql *goQL) UseWhitelister() (WhiteLister, error) {
 	if goql.dbName == "" || goql.db == nil {
 		return nil, ErrDBConfigurationIsMandatory
 	}
@@ -65,7 +76,7 @@ func (goql *goQL) UseWhitelister() (whitelist.WhiteLister, error) {
 	return whitelist.New(repo, goql.cache), nil
 }
 
-func (goql *goQL) UseGQLCacher() (cacher.GQLCacher, error) {
+func (goql *goQL) UseGQLCacher() (Cacher, error) {
 	if goql.cache == nil {
 		return nil, ErrCacheConfigurationIsMandatory
 	}

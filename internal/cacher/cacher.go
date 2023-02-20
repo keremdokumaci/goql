@@ -8,16 +8,11 @@ import (
 	"github.com/keremdokumaci/goql/internal/cache"
 )
 
-type GQLCacher interface {
-	GetOperation(operationName string) any
-	CacheQuery(query string, response any, ttl ...time.Duration) error
-}
-
 type gqlCacher struct {
 	cache cache.Cacher
 }
 
-func New(cache cache.Cacher) GQLCacher {
+func New(cache cache.Cacher) *gqlCacher {
 	return &gqlCacher{
 		cache: cache,
 	}
