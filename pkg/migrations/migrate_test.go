@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"os"
 	"testing"
 
 	"github.com/keremdokumaci/goql/test/utils"
@@ -28,10 +29,12 @@ func TestMigrateTestSuite(t *testing.T) {
 }
 
 func (s *MigrateTestSuite) TestMigratePostgres() {
+	os.Setenv("MIGRATION_DIR", "./postgres")
+
 	err := MigratePostgres(s.DB)
 	s.Nil(err)
 
-	latestVersion := GetLatestMigrationNumber("./postgres")
+	latestVersion := GetLatestMigrationNumber(os.Getenv("MIGRATION_DIR"))
 
 	row := s.DB.QueryRow("select version from public.schema_migrations")
 	s.Nil(row.Err())
