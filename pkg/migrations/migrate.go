@@ -36,7 +36,12 @@ func MigratePostgres(db *sql.DB, migration ...int) error {
 		return err
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://postgres", "postgres", driver)
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance("file://"+dir+"/postgres", "postgres", driver)
 	if err != nil {
 		return err
 	}
