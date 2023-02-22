@@ -1,5 +1,15 @@
 #!/bin/bash
 
+test=""
+suite=""
+
+while getopts "t:s:" arg; do
+    case $arg in
+        t) test=$OPTARG;;
+        s) suite=$OPTARG;;
+    esac
+done
+
 function run_command {
     cmd=$1
     exit_program="${2:-1}"
@@ -31,6 +41,10 @@ function echo_colorized {
     fi
 }
 
+function test {
+    go test -p 1 -v -race $(pwd)/./...
+}
+
 echo "Downgrading compose..."
 run_command "docker compose -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
 
@@ -38,6 +52,20 @@ echo "Running compose up..."
 run_command "docker compose -f $(pwd)/docker/docker-compose-test.yml up -d"
 
 echo "Running tests..."
-test_status=TEST_MODE=$1 run_command "go test -p 1 -v -race $(pwd)/./..."
+
+if [ "$test" = "" ] && [ "$suite" = "" ];
+then
+    run_command "go test -p 1 -v -race $(pwd)/./..."
+fi
+
+if [ "$test" != "" ] && [ "$suite" = "" ];
+then
+    run_command "go test -p 1 -v -race -run $test $(pwd)/./..."
+fi
+
+if [ "$test" != "" ] && [ "$suite" != "" ];
+then
+    run_command "go test -p 1 -v -race -run ^$test$ -testify.m $suite $(pwd)/./..."
+fi
 
 echo_colorized "ALL TESTS PASSED" "green"
