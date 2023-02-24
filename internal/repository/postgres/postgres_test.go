@@ -78,7 +78,7 @@ func (s *PostgresRepositorySuite) TestGetByUniqueField() {
 	field := "operation_name"
 
 	// When
-	expectedQuery := fmt.Sprintf("select * from goql.test_models where %s=%s", field, value)
+	expectedQuery := fmt.Sprintf(`select * from "goql"."test_models" where "%s"='%v'`, field, value)
 	s.sqlMock.
 		ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 		WillReturnRows(

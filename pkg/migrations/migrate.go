@@ -41,9 +41,16 @@ func MigratePostgres(db *sql.DB, migration ...int) error {
 		return err
 	}
 
+	var migrationErr error
 	if len(migration) > 0 {
-		return m.Steps(migration[0])
+		migrationErr = m.Steps(migration[0])
+	} else {
+		migrationErr = m.Up()
 	}
 
-	return m.Up()
+	if migrationErr == migrate.ErrNoChange {
+		return nil
+	}
+
+	return migrationErr
 }

@@ -37,12 +37,13 @@ func (s *WhitelistTestSuite) TestOperationAllowed_OperationInCache() {
 	s.cache.On("Get", mock.AnythingOfType("string")).Return(true)
 
 	// Then
-	allowed := s.sut.OperationAllowed(context.TODO(), operationName)
+	allowed, err := s.sut.OperationAllowed(context.TODO(), operationName)
 
 	// Assertion
 	s.cache.AssertCalled(s.T(), "Get", mock.AnythingOfType("string"))
 	s.repository.AssertNotCalled(s.T(), "Get")
 	s.True(allowed)
+	s.Nil(err)
 }
 
 func (s *WhitelistTestSuite) TestOperationAllowed_OperationNotInCache() {
@@ -61,10 +62,11 @@ func (s *WhitelistTestSuite) TestOperationAllowed_OperationNotInCache() {
 		}, nil)
 
 	// Then
-	allowed := s.sut.OperationAllowed(context.TODO(), operationName)
+	allowed, err := s.sut.OperationAllowed(context.TODO(), operationName)
 
 	// Assertion
 	s.cache.AssertCalled(s.T(), "Get", operationName)
 	s.repository.AssertCalled(s.T(), "GetByUniqueField", context.TODO(), "operation_name", operationName)
 	s.True(allowed)
+	s.Nil(err)
 }

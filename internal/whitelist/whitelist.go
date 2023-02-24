@@ -13,15 +13,15 @@ type whiteLister struct {
 	cacher cache.Cacher
 }
 
-func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string) bool {
+func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string) (bool, error) {
 	cacheVal := w.cacher.Get(operationName)
 	if cacheVal != nil {
-		return true
+		return true, nil
 	}
 
 	_, err := w.repo.GetByUniqueField(ctx, "operation_name", operationName)
 
-	return err == nil
+	return err == nil, err
 }
 
 func New(repo repository.Repository[models.Whitelist], cacher cache.Cacher) *whiteLister {

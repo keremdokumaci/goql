@@ -9,7 +9,6 @@ import (
 )
 
 type MigrateTestSuite struct {
-	suite.Suite
 	utils.BaseSuite
 }
 

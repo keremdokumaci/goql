@@ -29,11 +29,16 @@ func (r *postgresRepository[T]) Get(ctx context.Context, ID int) (T, error) {
 }
 
 func (r *postgresRepository[T]) GetByUniqueField(ctx context.Context, field string, value any) (*T, error) {
-	query := fmt.Sprintf("select * from goql.%s where %s=%v", r.tableName, field, value)
-
 	var model T
-	row := r.sqlxDB.QueryRowxContext(ctx, query)
 
+	query := fmt.Sprintf(
+		`select * from "goql"."%s" where "%s"='%v'`,
+		r.tableName,
+		field,
+		value,
+	)
+
+	row := r.sqlxDB.QueryRowxContext(ctx, query)
 	err := row.StructScan(&model)
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ var (
 )
 
 type WhiteLister interface {
-	OperationAllowed(ctx context.Context, operationName string) bool
+	OperationAllowed(ctx context.Context, operationName string) (bool, error)
 }
 
 type Cacher interface {

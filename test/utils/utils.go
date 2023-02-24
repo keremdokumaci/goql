@@ -4,13 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type BaseSuite struct {
 	DB *sql.DB
+	suite.Suite
 }
 
-func (BaseSuite) SkipTestIfModeNot(t *testing.T, mode TestMode) {
+func (BaseSuite) SkipTestIfModeNot(t *testing.T, mode TestMode) { // nolint
 	if GetTestMode() != mode {
 		t.Skip("skipping tests for mode " + string(mode))
 	}
