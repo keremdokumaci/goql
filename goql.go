@@ -27,8 +27,8 @@ type WhiteLister interface {
 }
 
 type Cacher interface {
-	GetOperation(operationName string) any
 	CacheQuery(query string, response any, ttl ...time.Duration) error
+	GetQueryCache(query string) any
 }
 
 type goQL struct {

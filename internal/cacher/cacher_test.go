@@ -10,22 +10,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetOperation(t *testing.T) {
-	// Given
-	operationName := "test-operation"
-
-	// When
-	cache := &cacheMock.Cacher{}
-	cache.On("Get", mock.AnythingOfType("string")).Return("query-response")
-
-	// Then
-	sut := New(cache)
-	response := sut.GetOperation(operationName)
-
-	// Assertion
-	assert.NotNil(t, response)
-}
-
 func TestCacheQuery(t *testing.T) {
 	// Given
 	query := fixtures.Query
@@ -48,4 +32,27 @@ func TestCacheQuery(t *testing.T) {
 
 	// Assertion
 	assert.Nil(t, err)
+}
+
+func TestGetQueryCache(t *testing.T) {
+	// Given
+	query := fixtures.Query
+	response := "response"
+
+	// When
+	cache := &cacheMock.Cacher{}
+	cache.
+		On(
+			"Get",
+			mock.AnythingOfType("string"),
+		).
+		Return(response)
+
+	// Then
+	sut := New(cache)
+	res := sut.GetQueryCache(query)
+
+	// Assertion
+	assert.NotNil(t, res)
+	assert.Equal(t, response, res)
 }
