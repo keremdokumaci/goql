@@ -38,14 +38,12 @@ func (s *WhitelistIntegrationTestSuite) SetupSuite() {
 	cache := inmemory.New(nil)
 
 	s.sut = New(repository, cache)
-}
 
-func (s *WhitelistIntegrationTestSuite) BeforeTest(suiteName, testName string) {
 	tx, _ := s.DB.BeginTx(context.Background(), &sql.TxOptions{
 		Isolation: sql.LevelDefault,
 	})
 
-	_, err := tx.Exec(`INSERT INTO "goql"."whitelists" (operation_name, created_at) VALUES ($1,$2)`, "getProducts", time.Now())
+	_, err = tx.Exec(`INSERT INTO "goql"."whitelists" (operation_name, created_at) VALUES ($1,$2)`, "getProducts", time.Now())
 	if err != nil {
 		_ = tx.Rollback()
 		s.T().Fatal(err.Error())
@@ -53,7 +51,6 @@ func (s *WhitelistIntegrationTestSuite) BeforeTest(suiteName, testName string) {
 
 	_ = tx.Commit()
 }
-
 func TestWhitelistIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(WhitelistIntegrationTestSuite))
 }
@@ -62,10 +59,22 @@ func (s *WhitelistIntegrationTestSuite) TestOperationAllowed_OperationNotInCache
 	// Given
 	operationName := "getProducts"
 
-	// When
+	// Then
+	allowed, err := s.sut.OperationAllowed(context.Background(), operationName)
+
+	// Assert
+	s.Nil(err)
+	s.True(allowed)
+}
+
+func (s *WhitelistIntegrationTestSuite) TestOperationAllowed_OperationNotInCacheAndDB() {
+	// Given
+	operationName := "xyz"
 
 	// Then
 	allowed, err := s.sut.OperationAllowed(context.Background(), operationName)
+
+	// Assert
 	s.Nil(err)
-	s.True(allowed)
+	s.False(allowed)
 }

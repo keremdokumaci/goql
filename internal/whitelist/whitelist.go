@@ -2,6 +2,7 @@ package whitelist
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/keremdokumaci/goql/internal/cache"
 	"github.com/keremdokumaci/goql/internal/models"
@@ -20,6 +21,9 @@ func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string
 	}
 
 	_, err := w.repo.GetByUniqueField(ctx, "operation_name", operationName)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
 
 	return err == nil, err
 }

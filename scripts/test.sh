@@ -45,6 +45,9 @@ function test {
     go test -p 1 -v -race $(pwd)/./...
 }
 
+echo "Downgrading compose..."
+run_command "docker compose -p goql -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
+
 echo "Running compose up..."
 run_command "docker compose -p goql -f $(pwd)/docker/docker-compose-test.yml up -d"
 
@@ -68,6 +71,7 @@ then
 fi
 
 echo_colorized "ALL TESTS PASSED" "green"
+
 
 echo "Downgrading compose..."
 run_command "docker compose -p goql -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
