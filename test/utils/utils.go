@@ -1,15 +1,19 @@
 package utils
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/suite"
 )
 
 type BaseSuite struct {
-	DB *sql.DB
+	DB         *sql.DB
+	RedisCache *redis.Client
 	suite.Suite
 }
 
@@ -20,7 +24,13 @@ func (BaseSuite) SkipTestIfModeNot(t *testing.T, mode TestMode) { // nolint
 }
 
 func (b *BaseSuite) TearDownSuite() {
-	b.DB.Close()
+	if b.DB != nil {
+		b.DB.Close()
+	}
+	if b.RedisCache != nil {
+		b.RedisCache.Close()
+
+	}
 }
 
 func (b *BaseSuite) PostgresConnection() error {
@@ -38,5 +48,23 @@ func (b *BaseSuite) PostgresConnection() error {
 	}
 
 	b.DB = db
+	return nil
+}
+
+func (b *BaseSuite) RedisConnection() error {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	err := rdb.Ping(ctxTimeout).Err()
+	if err != nil {
+		return err
+	}
+
+	b.RedisCache = rdb
 	return nil
 }
