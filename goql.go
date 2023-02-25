@@ -6,6 +6,8 @@ import (
 	"errors"
 	"time"
 
+	redisv9 "github.com/redis/go-redis/v9"
+
 	"github.com/keremdokumaci/goql/internal/cache"
 	"github.com/keremdokumaci/goql/internal/cache/inmemory"
 	"github.com/keremdokumaci/goql/internal/cache/redis"
@@ -49,14 +51,13 @@ func (goql *goQL) ConfigureDB(dbName DB, db *sql.DB) *goQL {
 	return goql
 }
 
-func (goql *goQL) ConfigureCache(cacheName Cache) *goQL {
-	switch cacheName {
-	case INMEMORY:
-		goql.cache = inmemory.New(nil)
-	case REDIS:
-		goql.cache = redis.New()
-	}
+func (goql *goQL) ConfigureInmemoryCache() *goQL {
+	goql.cache = inmemory.New(nil)
+	return goql
+}
 
+func (goql *goQL) ConfigureRedisCache(client *redisv9.Client) *goQL {
+	goql.cache = redis.New(client)
 	return goql
 }
 
