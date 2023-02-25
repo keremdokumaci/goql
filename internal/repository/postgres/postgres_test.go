@@ -75,7 +75,7 @@ func (s *PostgresRepositorySuite) TestGetByUniqueField() {
 	// Given
 	ctx := context.TODO()
 	value := "get"
-	field := "operation_name"
+	field := "query_name"
 
 	// When
 	expectedQuery := fmt.Sprintf(`select * from "goql"."test_models" where "%s"='%v'`, field, value)

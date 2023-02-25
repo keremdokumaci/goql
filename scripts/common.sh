@@ -8,12 +8,12 @@ function run_command {
     status=$?
     
     if [ $status -ne 0 ]; then
-        echo "\\n$cmd failed"
+        echo "$cmd failed"
         if [ $exit_program -eq 1 ]; then
             exit 1
         fi
     else
-        echo "\\n$cmd command was successful"
+        echo "$cmd command was successful"
     fi
     
     return $status

@@ -6,14 +6,14 @@ import (
 )
 
 type Query interface {
-	OperationName() string
+	Name() string
 }
 
 type query struct {
 	*ast.Document
 }
 
-func (q *query) OperationName() string {
+func (q *query) Name() string {
 	definition := q.Definitions[0]
 
 	operationDef, ok := definition.(*ast.OperationDefinition)

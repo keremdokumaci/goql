@@ -29,7 +29,7 @@ func TestWhitelistTestSuite(t *testing.T) {
 	suite.Run(t, new(WhitelistTestSuite))
 }
 
-func (s *WhitelistTestSuite) TestQueryAllowed_OperationInCache() {
+func (s *WhitelistTestSuite) TestQueryAllowed_QueryInCache() {
 	// Given
 	queryName := "query_name"
 
@@ -46,7 +46,7 @@ func (s *WhitelistTestSuite) TestQueryAllowed_OperationInCache() {
 	s.Nil(err)
 }
 
-func (s *WhitelistTestSuite) TestQueryAllowed_OperationNotInCache() {
+func (s *WhitelistTestSuite) TestQueryAllowed_QueryNotInCache() {
 	// Given
 	queryName := "query_name"
 

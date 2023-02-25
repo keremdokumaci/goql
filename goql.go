@@ -24,7 +24,7 @@ var (
 )
 
 type WhiteLister interface {
-	QueryAllowed(ctx context.Context, operationName string) (bool, error)
+	QueryAllowed(ctx context.Context, queryName string) (bool, error)
 }
 
 type Cacher interface {
