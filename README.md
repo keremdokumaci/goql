@@ -3,7 +3,7 @@
 [![Golang Tests](https://github.com/keremdokumaci/goql/actions/workflows/go-test.yml/badge.svg)](https://github.com/keremdokumaci/goql/actions/workflows/go-test.yml)
 ![Test Coverage](https://img.shields.io/badge/coverage-84.0%25-orange.svg)
 
-# GoQL
+# [WIP] GoQL
 
 `A GraphQL helper to deal with GraphQL requirements.`
 
