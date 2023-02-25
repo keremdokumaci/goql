@@ -20,4 +20,4 @@ migrate:
 
 # Test
 test:
-	bash -c "$(THIS_DIR)scripts/test.sh $(ARGS)"
+	bash -c "$(THIS_DIR)scripts/test.sh -t $(t)"

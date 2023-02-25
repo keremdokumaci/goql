@@ -1,12 +1,10 @@
 #!/bin/bash
 
 test=""
-suite=""
 
-while getopts "t:s:" arg; do
+while getopts "t:" arg; do
     case $arg in
         t) test=$OPTARG;;
-        s) suite=$OPTARG;;
     esac
 done
 
@@ -55,23 +53,14 @@ echo "Running tests..."
 
 run_command "go clean -testcache"
 
-if [ "$test" = "" ] && [ "$suite" = "" ];
+if [ "$test" = "" ];
 then
     run_command "go test -p 1 -v -race ./..."
-fi
-
-if [ "$test" != "" ] && [ "$suite" = "" ];
-then
+else
     run_command "go test -p 1 -v -race -run $test $(pwd)/./..."
 fi
 
-if [ "$test" != "" ] && [ "$suite" != "" ];
-then
-    run_command "go test -run $test -testify.m $suite -p 1 -v -race $(pwd)/./..."
-fi
-
 echo_colorized "ALL TESTS PASSED" "green"
-
 
 echo "Downgrading compose..."
 run_command "docker compose -p goql -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
