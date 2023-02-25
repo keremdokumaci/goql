@@ -67,7 +67,7 @@ func TestWhitelistIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(WhitelistIntegrationTestSuite))
 }
 
-func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_OperationNotInCache() {
+func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_QueryNotInCache() {
 	// Given
 	queryName := "getProducts"
 
@@ -82,7 +82,7 @@ func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_OperationNotInCache() {
 	s.True(allowed)
 }
 
-func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_OperationNotInCacheAndDB() {
+func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_QueryNotInCacheAndDB() {
 	// Given
 	queryName := "xyz"
 

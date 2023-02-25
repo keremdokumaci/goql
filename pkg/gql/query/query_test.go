@@ -25,9 +25,9 @@ func TestNewQuery_InvalidQuery(t *testing.T) {
 	assert.Nil(t, query)
 }
 
-func TestOperationName(t *testing.T) {
+func TestName(t *testing.T) {
 	query, _ := Parse(fixtures.Query)
-	operationName := query.OperationName()
+	queryName := query.Name()
 
-	assert.Equal(t, "GetProductVariantByVariantIds", operationName)
+	assert.Equal(t, "GetProductVariantByVariantIds", queryName)
 }
