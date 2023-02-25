@@ -29,5 +29,12 @@ func TestName(t *testing.T) {
 	query, _ := Parse(fixtures.Query)
 	queryName := query.Name()
 
-	assert.Equal(t, "GetProductVariantByVariantIds", queryName)
+	assert.Equal(t, fixtures.QUERY_NAME, queryName)
+}
+
+func TestName_WithNoNamedQuery(t *testing.T) {
+	query, _ := Parse(fixtures.QueryWithNoName)
+	queryName := query.Name()
+
+	assert.Equal(t, "", queryName)
 }

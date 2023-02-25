@@ -1,70 +1,38 @@
 package fixtures
 
+const (
+	QUERY_NAME = "HeroNameAndFriends"
+)
+
 var Query string = `
-	query GetProductVariantByVariantIds($first: Int!, $ids:[ID!]) {
-		productVariants(ids: $ids, first: $first) {
-			edges {
-			node {
-				id
-				name
-				sku
-				stocks {
-				warehouse {
-					id
-				}
-				}
-				product {
-					id
-					name
-				}
-			}
-			}
+query HeroNameAndFriends {
+	hero {
+	  name
+	  friends {
+		name
+	  }
 	}
-	}
+}
 `
 
 var QueryWithNoName string = `
-	{
-		productVariants(ids: $ids, first: $first) {
-			edges {
-			node {
-				id
-				name
-				sku
-				stocks {
-				warehouse {
-					id
-				}
-				}
-				product {
-					id
-					name
-				}
-			}
-			}
+{
+	hero {
+	  name
+	  friends {
+		name
+	  }
 	}
-	}
+}
 `
 
 var InvalidQuery string = `
-	{
-		(ids: $ids, first: $first) {
-			edges {
-			node {
-				id
-				name
-				sku
-				stocks {
-				warehouse {
-					id
-				}
-				}
-				product {
-					id
-					name
-				}
-			}
-			}
+query HeroNameAndFriends {
+	hero 
+	  name
+	  friends {
+		name
+	  }
 	}
-	}
+}
 `
