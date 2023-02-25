@@ -7,54 +7,55 @@ import (
 
 	"github.com/keremdokumaci/goql/internal/models"
 	cacheMock "github.com/keremdokumaci/goql/mocks/cache"
-	repositoryMock "github.com/keremdokumaci/goql/mocks/repository"
+	whitelistRepositoryMock "github.com/keremdokumaci/goql/mocks/whitelist/repository"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
 type WhitelistTestSuite struct {
-	sut        *whiteLister
-	cache      *cacheMock.Cacher
-	repository *repositoryMock.Repository[models.Whitelist]
+	sut                 *whiteLister
+	cache               *cacheMock.Cacher
+	whitelistRepository *whitelistRepositoryMock.WhitelistRepository
 	suite.Suite
 }
 
 func (s *WhitelistTestSuite) BeforeTest(suiteName, testName string) {
 	s.cache = &cacheMock.Cacher{}
-	s.repository = &repositoryMock.Repository[models.Whitelist]{}
-	s.sut = New(s.repository, s.cache)
+	s.whitelistRepository = &whitelistRepositoryMock.WhitelistRepository{}
+	s.sut = New(s.whitelistRepository, s.cache)
 }
 
 func TestWhitelistTestSuite(t *testing.T) {
 	suite.Run(t, new(WhitelistTestSuite))
 }
 
-func (s *WhitelistTestSuite) TestOperationAllowed_OperationInCache() {
+func (s *WhitelistTestSuite) TestQueryAllowed_OperationInCache() {
 	// Given
-	operationName := "operation_name"
+	queryName := "query_name"
 
 	// When
 	s.cache.On("Get", mock.AnythingOfType("string")).Return(true)
 
 	// Then
-	allowed, err := s.sut.OperationAllowed(context.TODO(), operationName)
+	allowed, err := s.sut.QueryAllowed(context.TODO(), queryName)
 
 	// Assertion
 	s.cache.AssertCalled(s.T(), "Get", mock.AnythingOfType("string"))
-	s.repository.AssertNotCalled(s.T(), "Get")
+	s.whitelistRepository.AssertNotCalled(s.T(), "GetWhitelistByQueryName")
 	s.True(allowed)
 	s.Nil(err)
 }
 
-func (s *WhitelistTestSuite) TestOperationAllowed_OperationNotInCache() {
+func (s *WhitelistTestSuite) TestQueryAllowed_OperationNotInCache() {
 	// Given
-	operationName := "operation_name"
+	queryName := "query_name"
 
 	// When
 	s.cache.On("Get", mock.AnythingOfType("string")).Return(nil)
-	s.repository.On("GetByUniqueField", mock.Anything, mock.AnythingOfType("string"), mock.Anything).
+	s.cache.On("Set", mock.AnythingOfType("string"), mock.AnythingOfType("bool")).Return(nil)
+	s.whitelistRepository.On("GetWhitelistByQueryName", mock.AnythingOfType("string")).
 		Return(&models.Whitelist{
-			OperationName: "test_operation",
+			QueryID: 1,
 			BaseModel: models.BaseModel{
 				ID:        1,
 				CreatedAt: time.Now(),
@@ -62,11 +63,11 @@ func (s *WhitelistTestSuite) TestOperationAllowed_OperationNotInCache() {
 		}, nil)
 
 	// Then
-	allowed, err := s.sut.OperationAllowed(context.TODO(), operationName)
+	allowed, err := s.sut.QueryAllowed(context.TODO(), queryName)
 
 	// Assertion
-	s.cache.AssertCalled(s.T(), "Get", operationName)
-	s.repository.AssertCalled(s.T(), "GetByUniqueField", context.TODO(), "operation_name", operationName)
+	s.cache.AssertCalled(s.T(), "Get", queryName)
+	s.whitelistRepository.AssertCalled(s.T(), "GetWhitelistByQueryName", queryName)
 	s.True(allowed)
 	s.Nil(err)
 }

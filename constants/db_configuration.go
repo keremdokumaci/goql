@@ -1,4 +1,4 @@
-package goql
+package constants
 
 type DB string
 

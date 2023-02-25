@@ -2,7 +2,7 @@ package models
 
 type Whitelist struct {
 	BaseModel
-	OperationName string `db:"operation_name"`
+	QueryID int `db:"query_id"`
 }
 
 func (Whitelist) TableName() string {

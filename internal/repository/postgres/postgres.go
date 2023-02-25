@@ -6,7 +6,9 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/keremdokumaci/goql/constants"
 	"github.com/keremdokumaci/goql/internal/models"
+	repositoryutils "github.com/keremdokumaci/goql/internal/repository/utils"
 )
 
 type postgresRepository[T models.Modeler] struct {
@@ -51,7 +53,7 @@ func New[T models.Modeler](db *sql.DB) *postgresRepository[T] {
 	var model T
 	tableName := model.TableName()
 	return &postgresRepository[T]{
-		sqlxDB:    sqlx.NewDb(db, "pgx"),
+		sqlxDB:    sqlx.NewDb(db, repositoryutils.GetDriverNameByDBName(constants.POSTGRES)),
 		tableName: tableName,
 	}
 }

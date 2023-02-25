@@ -8,14 +8,13 @@ import (
 
 	redisv9 "github.com/redis/go-redis/v9"
 
+	"github.com/keremdokumaci/goql/constants"
 	"github.com/keremdokumaci/goql/internal/cache"
 	"github.com/keremdokumaci/goql/internal/cache/inmemory"
 	"github.com/keremdokumaci/goql/internal/cache/redis"
 	"github.com/keremdokumaci/goql/internal/cacher"
-	"github.com/keremdokumaci/goql/internal/models"
-	"github.com/keremdokumaci/goql/internal/repository"
-	"github.com/keremdokumaci/goql/internal/repository/postgres"
 	"github.com/keremdokumaci/goql/internal/whitelist"
+	whitelistrepository "github.com/keremdokumaci/goql/internal/whitelist/repository"
 )
 
 var (
@@ -25,7 +24,7 @@ var (
 )
 
 type WhiteLister interface {
-	OperationAllowed(ctx context.Context, operationName string) (bool, error)
+	QueryAllowed(ctx context.Context, operationName string) (bool, error)
 }
 
 type Cacher interface {
@@ -36,7 +35,7 @@ type Cacher interface {
 type goQL struct {
 	cache  cache.Cacher
 	db     *sql.DB
-	dbName DB
+	dbName constants.DB
 }
 
 // New returns a goQL struct pointer.
@@ -44,7 +43,7 @@ func New() *goQL {
 	return &goQL{}
 }
 
-func (goql *goQL) ConfigureDB(dbName DB, db *sql.DB) *goQL {
+func (goql *goQL) ConfigureDB(dbName constants.DB, db *sql.DB) *goQL {
 	goql.db = db
 	goql.dbName = dbName
 
@@ -66,12 +65,10 @@ func (goql *goQL) UseWhitelister() (WhiteLister, error) {
 		return nil, ErrDBConfigurationIsMandatory
 	}
 
-	var repo repository.Repository[models.Whitelist]
-	switch goql.dbName {
-	case POSTGRES:
-		repo = postgres.New[models.Whitelist](goql.db)
-	default:
-		return nil, ErrUnexpectedDBType
+	var repo whitelistrepository.WhitelistRepository
+	repo, err := whitelistrepository.New(goql.dbName, goql.db)
+	if err != nil {
+		return nil, err
 	}
 
 	return whitelist.New(repo, goql.cache), nil

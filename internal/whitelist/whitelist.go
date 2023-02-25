@@ -5,30 +5,33 @@ import (
 	"database/sql"
 
 	"github.com/keremdokumaci/goql/internal/cache"
-	"github.com/keremdokumaci/goql/internal/models"
-	"github.com/keremdokumaci/goql/internal/repository"
+	whitelistrepository "github.com/keremdokumaci/goql/internal/whitelist/repository"
 )
 
 type whiteLister struct {
-	repo   repository.Repository[models.Whitelist]
+	repo   whitelistrepository.WhitelistRepository
 	cacher cache.Cacher
 }
 
-func (w *whiteLister) OperationAllowed(ctx context.Context, operationName string) (bool, error) {
-	cacheVal := w.cacher.Get(operationName)
+func (w *whiteLister) QueryAllowed(ctx context.Context, queryName string) (bool, error) {
+	cacheVal := w.cacher.Get(queryName)
 	if cacheVal != nil {
 		return true, nil
 	}
 
-	_, err := w.repo.GetByUniqueField(ctx, "operation_name", operationName)
+	_, err := w.repo.GetWhitelistByQueryName(queryName)
 	if err == sql.ErrNoRows {
 		return false, nil
 	}
+	if err != nil {
+		return false, err
+	}
 
-	return err == nil, err
+	_ = w.cacher.Set(queryName, true)
+	return true, nil
 }
 
-func New(repo repository.Repository[models.Whitelist], cacher cache.Cacher) *whiteLister {
+func New(repo whitelistrepository.WhitelistRepository, cacher cache.Cacher) *whiteLister {
 	return &whiteLister{
 		repo:   repo,
 		cacher: cacher,
