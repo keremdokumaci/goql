@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/keremdokumaci/goql/constants"
 	"github.com/keremdokumaci/goql/internal/cache/inmemory"
-	"github.com/keremdokumaci/goql/internal/models"
-	"github.com/keremdokumaci/goql/internal/repository/postgres"
+	whitelistrepository "github.com/keremdokumaci/goql/internal/whitelist/repository"
 	"github.com/keremdokumaci/goql/pkg/migrations"
 	testUtils "github.com/keremdokumaci/goql/test/utils"
 	_ "github.com/lib/pq"
@@ -34,7 +34,11 @@ func (s *WhitelistIntegrationTestSuite) SetupSuite() {
 		s.T().Fatal(err.Error())
 	}
 
-	repository := postgres.New[models.Whitelist](s.DB)
+	repository, err := whitelistrepository.New(constants.POSTGRES, s.DB)
+	if err != nil {
+		s.T().Fatal(err.Error())
+	}
+
 	cache := inmemory.New(nil)
 
 	s.sut = New(repository, cache)
@@ -43,7 +47,15 @@ func (s *WhitelistIntegrationTestSuite) SetupSuite() {
 		Isolation: sql.LevelDefault,
 	})
 
-	_, err = tx.Exec(`INSERT INTO "goql"."whitelists" (operation_name, created_at) VALUES ($1,$2)`, "getProducts", time.Now())
+	queryID := 1
+
+	_, err = tx.Exec(`INSERT INTO "goql"."queries" (id, name, created_at) VALUES ($1,$2,$3) RETURNING id`, queryID, "getProducts", time.Now())
+	if err != nil {
+		_ = tx.Rollback()
+		s.T().Fatal(err.Error())
+	}
+
+	_, err = tx.Exec(`INSERT INTO "goql"."whitelists" (query_id, created_at) VALUES ($1,$2)`, queryID, time.Now())
 	if err != nil {
 		_ = tx.Rollback()
 		s.T().Fatal(err.Error())
@@ -55,24 +67,30 @@ func TestWhitelistIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(WhitelistIntegrationTestSuite))
 }
 
-func (s *WhitelistIntegrationTestSuite) TestOperationAllowed_OperationNotInCache() {
+func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_OperationNotInCache() {
 	// Given
-	operationName := "getProducts"
+	queryName := "getProducts"
 
 	// Then
-	allowed, err := s.sut.OperationAllowed(context.Background(), operationName)
+	allowed, err := s.sut.QueryAllowed(context.Background(), queryName)
+	if err != nil {
+		s.T().Fatal(err.Error())
+	}
 
 	// Assert
 	s.Nil(err)
 	s.True(allowed)
 }
 
-func (s *WhitelistIntegrationTestSuite) TestOperationAllowed_OperationNotInCacheAndDB() {
+func (s *WhitelistIntegrationTestSuite) TestQueryAllowed_OperationNotInCacheAndDB() {
 	// Given
-	operationName := "xyz"
+	queryName := "xyz"
 
 	// Then
-	allowed, err := s.sut.OperationAllowed(context.Background(), operationName)
+	allowed, err := s.sut.QueryAllowed(context.Background(), queryName)
+	if err != nil {
+		s.T().Fatal(err.Error())
+	}
 
 	// Assert
 	s.Nil(err)

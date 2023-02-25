@@ -73,5 +73,5 @@ fi
 echo_colorized "ALL TESTS PASSED" "green"
 
 
-echo "Downgrading compose..."
-run_command "docker compose -p goql -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
+# echo "Downgrading compose..."
+# run_command "docker compose -p goql -f $(pwd)/docker/docker-compose-test.yml down --rmi local --remove-orphans"
